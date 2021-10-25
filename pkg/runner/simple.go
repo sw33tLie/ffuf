@@ -118,8 +118,6 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	req.Opaque = strings.ReplaceAll(req.Opaque, PORT_KEYWORD, port)
 	req.Data = []byte(strings.ReplaceAll(string(req.Data), PORT_KEYWORD, port))
 
-	fmt.Println(req.Host)
-
 	req.Input = input
 	return req, nil
 }
