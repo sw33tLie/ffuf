@@ -21,6 +21,12 @@ import (
 //Download results < 5MB
 const MAX_DOWNLOAD_SIZE = 5242880
 
+const (
+	HOST_KEYWORD     = "{HOST}"
+	HOSTPORT_KEYWORD = "{HOSTPORT}" // something.com:port
+	PORT_KEYWORD     = "{PORT}"
+)
+
 type SimpleRunner struct {
 	config *ffuf.Config
 	client *http.Client
@@ -90,6 +96,29 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 		req.Opaque = strings.ReplaceAll(req.Opaque, keyword, string(inputitem))
 		req.Data = []byte(strings.ReplaceAll(string(req.Data), keyword, string(inputitem)))
 	}
+
+	// Needed to extract Host
+	u, err := url.Parse(req.Url)
+	if err != nil {
+		panic(err)
+	}
+	host, port, _ := net.SplitHostPort(u.Host)
+
+	// Custom templates (TODO: add for headers too)
+
+	req.Url = strings.ReplaceAll(req.Url, HOST_KEYWORD, host)
+	req.Opaque = strings.ReplaceAll(req.Opaque, HOST_KEYWORD, host)
+	req.Data = []byte(strings.ReplaceAll(string(req.Data), HOST_KEYWORD, host))
+
+	req.Url = strings.ReplaceAll(req.Url, HOSTPORT_KEYWORD, u.Host)
+	req.Opaque = strings.ReplaceAll(req.Opaque, HOSTPORT_KEYWORD, u.Host)
+	req.Data = []byte(strings.ReplaceAll(string(req.Data), HOSTPORT_KEYWORD, u.Host))
+
+	req.Url = strings.ReplaceAll(req.Url, PORT_KEYWORD, port)
+	req.Opaque = strings.ReplaceAll(req.Opaque, PORT_KEYWORD, port)
+	req.Data = []byte(strings.ReplaceAll(string(req.Data), PORT_KEYWORD, port))
+
+	fmt.Println(req.Host)
 
 	req.Input = input
 	return req, nil
