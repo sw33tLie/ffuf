@@ -44,6 +44,9 @@ func (s *Stdoutput) Banner() {
 	fmt.Fprintf(os.Stderr, "%s\n       v%s\n%s\n\n", BANNER_HEADER, version, BANNER_SEP)
 	printOption([]byte("Method"), []byte(s.config.Method))
 	printOption([]byte("URL"), []byte(s.config.Url))
+	if s.config.Opaque != "" {
+		printOption([]byte("Opaque"), []byte(s.config.Opaque))
+	}
 
 	// Print wordlists
 	for _, provider := range s.config.InputProviders {
