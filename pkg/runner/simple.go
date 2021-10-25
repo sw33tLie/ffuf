@@ -74,6 +74,7 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 
 	req.Headers = r.config.Headers
 	req.Url = r.config.Url
+	req.Opaque = r.config.Opaque
 	req.Method = r.config.Method
 	req.Data = []byte(r.config.Data)
 
@@ -86,6 +87,7 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 		}
 		req.Headers = headers
 		req.Url = strings.ReplaceAll(req.Url, keyword, string(inputitem))
+		req.Opaque = strings.ReplaceAll(req.Opaque, keyword, string(inputitem))
 		req.Data = []byte(strings.ReplaceAll(string(req.Data), keyword, string(inputitem)))
 	}
 
