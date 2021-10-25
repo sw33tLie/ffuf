@@ -5,6 +5,7 @@ type Request struct {
 	Method   string
 	Host     string
 	Url      string
+	Opaque   string
 	Headers  map[string]string
 	Data     []byte
 	Input    map[string][]byte
@@ -16,6 +17,7 @@ func NewRequest(conf *Config) Request {
 	var req Request
 	req.Method = conf.Method
 	req.Url = conf.Url
+	req.Opaque = conf.Opaque
 	req.Headers = make(map[string]string)
 	return req
 }

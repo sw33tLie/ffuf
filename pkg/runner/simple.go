@@ -137,6 +137,10 @@ func (r *SimpleRunner) Execute(req *ffuf.Request) (ffuf.Response, error) {
 		rawreq, _ = httputil.DumpRequestOut(httpreq, true)
 	}
 
+	if req.Opaque != "" {
+		httpreq.URL.Opaque = req.Opaque
+	}
+
 	httpresp, err := r.client.Do(httpreq)
 	if err != nil {
 		return ffuf.Response{}, err

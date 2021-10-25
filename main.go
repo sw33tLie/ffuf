@@ -104,6 +104,7 @@ func ParseFlags(opts *ffuf.ConfigOptions) *ffuf.ConfigOptions {
 	flag.StringVar(&opts.Input.InputShell, "input-shell", opts.Input.InputShell, "Shell to be used for running command")
 	flag.StringVar(&opts.Input.Request, "request", opts.Input.Request, "File containing the raw http request")
 	flag.StringVar(&opts.Input.RequestProto, "request-proto", opts.Input.RequestProto, "Protocol to use along with raw request")
+	flag.StringVar(&opts.Input.Opaque, "opaque", opts.Input.Opaque, "Use opaque path override")
 	flag.StringVar(&opts.Matcher.Lines, "ml", opts.Matcher.Lines, "Match amount of lines in response")
 	flag.StringVar(&opts.Matcher.Regexp, "mr", opts.Matcher.Regexp, "Match regexp")
 	flag.StringVar(&opts.Matcher.Size, "ms", opts.Matcher.Size, "Match HTTP response size")

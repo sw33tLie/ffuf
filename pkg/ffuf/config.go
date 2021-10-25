@@ -44,6 +44,7 @@ type Config struct {
 	RecursionStrategy      string                    `json:"recursion_strategy"`
 	ReplayProxyURL         string                    `json:"replayproxyurl"`
 	SNI                    string                    `json:"sni"`
+	Opaque                 string                    `json:"opaque"`
 	StopOn403              bool                      `json:"stop_403"`
 	StopOnAll              bool                      `json:"stop_all"`
 	StopOnErrors           bool                      `json:"stop_errors"`

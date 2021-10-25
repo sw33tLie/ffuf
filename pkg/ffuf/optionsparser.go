@@ -72,6 +72,7 @@ type InputOptions struct {
 	Request                string
 	RequestProto           string
 	Wordlists              []string
+	Opaque                 string
 }
 
 type OutputOptions struct {
@@ -142,6 +143,7 @@ func NewConfigOptions() *ConfigOptions {
 	c.Input.InputNum = 100
 	c.Input.Request = ""
 	c.Input.RequestProto = "https"
+	c.Input.Opaque = ""
 	c.Matcher.Lines = ""
 	c.Matcher.Regexp = ""
 	c.Matcher.Size = ""
@@ -253,6 +255,10 @@ func ConfigFromOptions(parseOpts *ConfigOptions, ctx context.Context, cancel con
 	//Prepare URL
 	if parseOpts.HTTP.URL != "" {
 		conf.Url = parseOpts.HTTP.URL
+	}
+
+	if parseOpts.Input.Opaque != "" {
+		conf.Opaque = parseOpts.Input.Opaque
 	}
 
 	// Prepare SNI
