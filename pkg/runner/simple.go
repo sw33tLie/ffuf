@@ -11,10 +11,10 @@ import (
 	"net/http/httputil"
 	"net/textproto"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
-	"unicode"
 
 	"github.com/ffuf/ffuf/pkg/ffuf"
 )
@@ -99,9 +99,8 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	}
 
 	// Needed to extract Host
-	u, err := url.Parse(strings.TrimFunc(req.Url, func(r rune) bool {
-		return !unicode.IsGraphic(r)
-	}))
+	re := regexp.MustCompile("[[:^ascii:]]")
+	u, err := url.Parse(re.ReplaceAllLiteralString(req.Url, ""))
 	if err != nil {
 		panic(err)
 	}
