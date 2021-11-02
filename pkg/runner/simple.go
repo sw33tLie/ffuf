@@ -100,7 +100,9 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	// Needed to extract Host
 	u, err := url.Parse(req.Url)
 	if err != nil {
-		panic(err)
+		if !strings.Contains(err.Error(), "invalid control character in URL") {
+			panic(err)
+		}
 	}
 	host, port, _ := net.SplitHostPort(u.Host)
 
