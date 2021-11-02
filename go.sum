@@ -1,4 +1,6 @@
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/icza/gox v0.0.0-20210726201659-cd40a3f8d324 h1:vgRDKn3I9l793fk4V5omw4ADVOXS1F8F6HBvi+ZXNdM=
+github.com/icza/gox v0.0.0-20210726201659-cd40a3f8d324/go.mod h1:VbcN86fRkkUMPX2ufM85Um8zFndLZswoIW1eYtpAcVk=
 github.com/jpillora/go-tld v1.1.1 h1:P1ZwtKDHBYYUl235R/D64cdBARfGYzEy1Hg2Ikir3FQ=
 github.com/jpillora/go-tld v1.1.1/go.mod h1:kitBxOF//DR5FxYeIGw+etdiiTIq5S7bx0dwy1GUNAk=
 github.com/pelletier/go-toml v1.8.1 h1:1Nf83orprkJyknT6h7zbuEGUEjcyVlCxSUGTENmNCRM=

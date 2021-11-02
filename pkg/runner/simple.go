@@ -11,12 +11,12 @@ import (
 	"net/http/httputil"
 	"net/textproto"
 	"net/url"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/ffuf/ffuf/pkg/ffuf"
+	"github.com/icza/gox/stringsx"
 )
 
 //Download results < 5MB
@@ -99,8 +99,7 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	}
 
 	// Needed to extract Host
-	re := regexp.MustCompile("[[:^ascii:]]")
-	u, err := url.Parse(re.ReplaceAllLiteralString(req.Url, ""))
+	u, err := url.Parse(stringsx.Clean(req.Url))
 	if err != nil {
 		panic(err)
 	}
