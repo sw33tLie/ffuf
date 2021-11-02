@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/ffuf/ffuf/pkg/ffuf"
 )
@@ -98,7 +99,9 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	}
 
 	// Needed to extract Host
-	u, err := url.Parse(strings.ToValidUTF8(req.Url, ""))
+	u, err := url.Parse(strings.TrimFunc(req.Url, func(r rune) bool {
+		return !unicode.IsGraphic(r)
+	}))
 	if err != nil {
 		panic(err)
 	}
