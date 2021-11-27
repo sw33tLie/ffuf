@@ -101,7 +101,8 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	// Needed to extract Host
 	u, err := url.Parse(stringsx.Clean(req.Url))
 	if err != nil {
-		panic(err)
+		// Todo: improve
+		return req, nil
 	}
 	host, port, _ := net.SplitHostPort(u.Host)
 
