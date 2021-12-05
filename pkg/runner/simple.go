@@ -103,7 +103,6 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	tempURL = strings.ReplaceAll(tempURL, PORT_KEYWORD, "")
 	tempURL = strings.ReplaceAll(tempURL, HOSTPORT_KEYWORD, "")
 
-	fmt.Println(tempURL)
 	u, err := url.Parse(stringsx.Clean(tempURL))
 	if err != nil {
 		// Todo: improve
@@ -126,7 +125,6 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	}
 
 	// Custom templates (TODO: add for headers too)
-	fmt.Println("Host: ", host, " port: ", port, " | u.Host: ", u.Host)
 	req.Url = strings.ReplaceAll(req.Url, HOST_KEYWORD, host)
 	req.Opaque = strings.ReplaceAll(req.Opaque, HOST_KEYWORD, host)
 	req.Data = []byte(strings.ReplaceAll(string(req.Data), HOST_KEYWORD, host))
