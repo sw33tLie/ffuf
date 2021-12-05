@@ -99,15 +99,34 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	}
 
 	// Needed to extract Host
-	u, err := url.Parse(stringsx.Clean(req.Url))
+	tempURL := strings.ReplaceAll(req.Url, HOST_KEYWORD, "")
+	tempURL = strings.ReplaceAll(tempURL, PORT_KEYWORD, "")
+	tempURL = strings.ReplaceAll(tempURL, HOSTPORT_KEYWORD, "")
+
+	fmt.Println(tempURL)
+	u, err := url.Parse(stringsx.Clean(tempURL))
 	if err != nil {
 		// Todo: improve
 		return req, nil
 	}
-	host, port, _ := net.SplitHostPort(u.Host)
+
+	var port, host string
+	if strings.Contains(u.Host, ":") {
+		// Port is not implicit aak 80 or 443
+		split := strings.Split(u.Host, ":")
+		host = split[0]
+		port = split[1]
+	} else {
+		host = u.Host
+		if strings.HasPrefix(req.Url, "https") {
+			port = "443"
+		} else {
+			port = "80"
+		}
+	}
 
 	// Custom templates (TODO: add for headers too)
-
+	fmt.Println("Host: ", host, " port: ", port, " | u.Host: ", u.Host)
 	req.Url = strings.ReplaceAll(req.Url, HOST_KEYWORD, host)
 	req.Opaque = strings.ReplaceAll(req.Opaque, HOST_KEYWORD, host)
 	req.Data = []byte(strings.ReplaceAll(string(req.Data), HOST_KEYWORD, host))
