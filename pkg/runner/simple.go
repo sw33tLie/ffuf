@@ -85,19 +85,6 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	req.Method = r.config.Method
 	req.Data = []byte(r.config.Data)
 
-	for keyword, inputitem := range input {
-		req.Method = strings.ReplaceAll(req.Method, keyword, string(inputitem))
-		headers := make(map[string]string, len(req.Headers))
-		for h, v := range req.Headers {
-			var CanonicalHeader string = textproto.CanonicalMIMEHeaderKey(strings.ReplaceAll(h, keyword, string(inputitem)))
-			headers[CanonicalHeader] = strings.ReplaceAll(v, keyword, string(inputitem))
-		}
-		req.Headers = headers
-		req.Url = strings.ReplaceAll(req.Url, keyword, string(inputitem))
-		req.Opaque = strings.ReplaceAll(req.Opaque, keyword, string(inputitem))
-		req.Data = []byte(strings.ReplaceAll(string(req.Data), keyword, string(inputitem)))
-	}
-
 	// Needed to extract Host
 	tempURL := strings.ReplaceAll(req.Url, HOST_KEYWORD, "")
 	tempURL = strings.ReplaceAll(tempURL, PORT_KEYWORD, "")
@@ -122,6 +109,23 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 		} else {
 			port = "80"
 		}
+	}
+
+	for keyword, inputitem := range input {
+		req.Method = strings.ReplaceAll(req.Method, keyword, string(inputitem))
+		headers := make(map[string]string, len(req.Headers))
+		for h, v := range req.Headers {
+			var CanonicalHeader string = textproto.CanonicalMIMEHeaderKey(strings.ReplaceAll(h, keyword, string(inputitem)))
+			v = strings.ReplaceAll(v, HOST_KEYWORD, host)
+			v = strings.ReplaceAll(v, HOSTPORT_KEYWORD, u.Host)
+			v = strings.ReplaceAll(v, PORT_KEYWORD, port)
+
+			headers[CanonicalHeader] = strings.ReplaceAll(v, keyword, string(inputitem))
+		}
+		req.Headers = headers
+		req.Url = strings.ReplaceAll(req.Url, keyword, string(inputitem))
+		req.Opaque = strings.ReplaceAll(req.Opaque, keyword, string(inputitem))
+		req.Data = []byte(strings.ReplaceAll(string(req.Data), keyword, string(inputitem)))
 	}
 
 	// Custom templates (TODO: add for headers too)
@@ -167,7 +171,7 @@ func (r *SimpleRunner) Execute(req *ffuf.Request) (ffuf.Response, error) {
 
 	// set default User-Agent header if not present
 	if _, ok := req.Headers["User-Agent"]; !ok {
-		req.Headers["User-Agent"] = fmt.Sprintf("%s v%s", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36", ffuf.Version())
+		req.Headers["User-Agent"] = fmt.Sprintf("%s v", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36")
 	}
 
 	// Handle Go http.Request special cases
