@@ -86,7 +86,6 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	req.Data = []byte(r.config.Data)
 
 	for keyword, inputitem := range input {
-		fmt.Println(string(keyword), string(inputitem))
 		req.Method = strings.ReplaceAll(req.Method, keyword, string(inputitem))
 		req.Url = strings.ReplaceAll(req.Url, keyword, string(inputitem))
 		req.Opaque = strings.ReplaceAll(req.Opaque, keyword, string(inputitem))
