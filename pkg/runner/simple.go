@@ -171,7 +171,7 @@ func (r *SimpleRunner) Execute(req *ffuf.Request) (ffuf.Response, error) {
 
 	// set default User-Agent header if not present
 	if _, ok := req.Headers["User-Agent"]; !ok {
-		req.Headers["User-Agent"] = fmt.Sprintf("%s v", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36")
+		req.Headers["User-Agent"] = fmt.Sprintf("%s", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36")
 	}
 
 	// Handle Go http.Request special cases
