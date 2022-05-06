@@ -3,7 +3,6 @@ package runner
 import (
 	"bytes"
 	"crypto/tls"
-	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -26,6 +25,7 @@ const (
 	HOST_KEYWORD     = "{HOST}"
 	HOSTPORT_KEYWORD = "{HOSTPORT}" // something.com:port
 	PORT_KEYWORD     = "{PORT}"
+	SUB_KEYWORD      = "{SUB}" // "test", is host is test.something.com
 )
 
 type SimpleRunner struct {
@@ -118,6 +118,8 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 		}
 	}
 
+	sub := strings.Split(host, ".")[0]
+
 	for keyword, inputitem := range input {
 		headers := make(map[string]string, len(req.Headers))
 		for h, v := range req.Headers {
@@ -125,6 +127,7 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 			v = strings.ReplaceAll(v, HOST_KEYWORD, host)
 			v = strings.ReplaceAll(v, HOSTPORT_KEYWORD, u.Host)
 			v = strings.ReplaceAll(v, PORT_KEYWORD, port)
+			v = strings.ReplaceAll(v, SUB_KEYWORD, sub)
 			headers[CanonicalHeader] = strings.ReplaceAll(v, keyword, string(inputitem))
 		}
 		req.Headers = headers
@@ -142,6 +145,10 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	req.Url = strings.ReplaceAll(req.Url, PORT_KEYWORD, port)
 	req.Opaque = strings.ReplaceAll(req.Opaque, PORT_KEYWORD, port)
 	req.Data = []byte(strings.ReplaceAll(string(req.Data), PORT_KEYWORD, port))
+
+	req.Url = strings.ReplaceAll(req.Url, SUB_KEYWORD, sub)
+	req.Opaque = strings.ReplaceAll(req.Opaque, SUB_KEYWORD, sub)
+	req.Data = []byte(strings.ReplaceAll(string(req.Data), SUB_KEYWORD, sub))
 
 	req.Input = input
 	return req, nil
@@ -173,7 +180,7 @@ func (r *SimpleRunner) Execute(req *ffuf.Request) (ffuf.Response, error) {
 
 	// set default User-Agent header if not present
 	if _, ok := req.Headers["User-Agent"]; !ok {
-		req.Headers["User-Agent"] = fmt.Sprintf("%s v%s", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36", ffuf.Version())
+		req.Headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.41 Safari/537.36"
 	}
 
 	// Handle Go http.Request special cases
