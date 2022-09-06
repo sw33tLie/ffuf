@@ -3,6 +3,7 @@ package runner
 import (
 	"bytes"
 	"crypto/tls"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -26,6 +27,7 @@ const (
 	HOSTPORT_KEYWORD = "{HOSTPORT}" // something.com:port
 	PORT_KEYWORD     = "{PORT}"
 	SUB_KEYWORD      = "{SUB}" // "test", is host is test.something.com
+	PATH_KEYWORD     = "{PATH}"
 )
 
 type SimpleRunner struct {
@@ -199,7 +201,8 @@ func (r *SimpleRunner) Execute(req *ffuf.Request) (ffuf.Response, error) {
 	}
 
 	if req.Opaque != "" {
-		httpreq.URL.Opaque = req.Opaque
+		fmt.Println(httpreq.URL.Path)
+		httpreq.URL.Opaque = strings.ReplaceAll(req.Opaque, PATH_KEYWORD, string(httpreq.URL.Path))
 	}
 
 	httpresp, err := r.client.Do(httpreq)
