@@ -3,7 +3,6 @@ package runner
 import (
 	"bytes"
 	"crypto/tls"
-	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -201,7 +200,6 @@ func (r *SimpleRunner) Execute(req *ffuf.Request) (ffuf.Response, error) {
 	}
 
 	if req.Opaque != "" {
-		fmt.Println(httpreq.URL.Path)
 		httpreq.URL.Opaque = strings.ReplaceAll(req.Opaque, PATH_KEYWORD, string(httpreq.URL.Path))
 	}
 
