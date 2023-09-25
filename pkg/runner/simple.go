@@ -18,11 +18,12 @@ import (
 	"github.com/icza/gox/stringsx"
 )
 
-//Download results < 5MB
+// Download results < 5MB
 const MAX_DOWNLOAD_SIZE = 5242880
 
 const (
 	HOST_KEYWORD     = "{HOST}"
+	SEMIHOST_KEYWORD = "{SEMIHOST}"
 	HOSTPORT_KEYWORD = "{HOSTPORT}" // something.com:port
 	PORT_KEYWORD     = "{PORT}"
 	SUB_KEYWORD      = "{SUB}" // "test", is host is test.something.com
@@ -77,6 +78,16 @@ func NewSimpleRunner(conf *ffuf.Config, replay bool) ffuf.RunnerProvider {
 	return &simplerunner
 }
 
+func removeLeftmostPart(s string) string {
+	// Find the index of the first dot
+	if idx := strings.Index(s, "."); idx != -1 {
+		// Return the substring starting after the first dot
+		return s[idx+1:]
+	}
+	// If there's no dot, return the original string
+	return s
+}
+
 func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	req := ffuf.NewRequest(r.config)
 
@@ -95,6 +106,7 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 
 	// Needed to extract Host
 	tempURL := strings.ReplaceAll(req.Url, HOST_KEYWORD, "")
+	tempURL = strings.ReplaceAll(req.Url, SEMIHOST_KEYWORD, "")
 	tempURL = strings.ReplaceAll(tempURL, PORT_KEYWORD, "")
 	tempURL = strings.ReplaceAll(tempURL, HOSTPORT_KEYWORD, "")
 
@@ -120,12 +132,14 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	}
 
 	sub := strings.Split(host, ".")[0]
+	semiHost := removeLeftmostPart(host)
 
 	for keyword, inputitem := range input {
 		headers := make(map[string]string, len(req.Headers))
 		for h, v := range req.Headers {
 			var CanonicalHeader string = textproto.CanonicalMIMEHeaderKey(strings.ReplaceAll(h, keyword, string(inputitem)))
 			v = strings.ReplaceAll(v, HOST_KEYWORD, host)
+			v = strings.ReplaceAll(v, SEMIHOST_KEYWORD, semiHost)
 			v = strings.ReplaceAll(v, HOSTPORT_KEYWORD, u.Host)
 			v = strings.ReplaceAll(v, PORT_KEYWORD, port)
 			v = strings.ReplaceAll(v, SUB_KEYWORD, sub)
@@ -138,6 +152,10 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	req.Url = strings.ReplaceAll(req.Url, HOST_KEYWORD, host)
 	req.Opaque = strings.ReplaceAll(req.Opaque, HOST_KEYWORD, host)
 	req.Data = []byte(strings.ReplaceAll(string(req.Data), HOST_KEYWORD, host))
+
+	req.Url = strings.ReplaceAll(req.Url, SEMIHOST_KEYWORD, semiHost)
+	req.Opaque = strings.ReplaceAll(req.Opaque, SEMIHOST_KEYWORD, semiHost)
+	req.Data = []byte(strings.ReplaceAll(string(req.Data), SEMIHOST_KEYWORD, semiHost))
 
 	req.Url = strings.ReplaceAll(req.Url, HOSTPORT_KEYWORD, u.Host)
 	req.Opaque = strings.ReplaceAll(req.Opaque, HOSTPORT_KEYWORD, u.Host)
