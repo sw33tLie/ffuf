@@ -78,7 +78,7 @@ func NewSimpleRunner(conf *ffuf.Config, replay bool) ffuf.RunnerProvider {
 	return &simplerunner
 }
 
-func removeLeftmostPart(s string) string {
+func RemoveLeftmostPart(s string) string {
 	// Find the index of the first dot
 	if idx := strings.Index(s, "."); idx != -1 {
 		// Return the substring starting after the first dot
@@ -106,7 +106,7 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 
 	// Needed to extract Host
 	tempURL := strings.ReplaceAll(req.Url, HOST_KEYWORD, "")
-	tempURL = strings.ReplaceAll(req.Url, SEMIHOST_KEYWORD, "")
+	tempURL = strings.ReplaceAll(tempURL, SEMIHOST_KEYWORD, "")
 	tempURL = strings.ReplaceAll(tempURL, PORT_KEYWORD, "")
 	tempURL = strings.ReplaceAll(tempURL, HOSTPORT_KEYWORD, "")
 
@@ -132,23 +132,18 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	}
 
 	sub := strings.Split(host, ".")[0]
-	semiHost := removeLeftmostPart(host)
+	semiHost := RemoveLeftmostPart(host)
 
 	for keyword, inputitem := range input {
 		headers := make(map[string]string, len(req.Headers))
 		for h, v := range req.Headers {
 			var CanonicalHeader string = textproto.CanonicalMIMEHeaderKey(strings.ReplaceAll(h, keyword, string(inputitem)))
-			v = strings.ReplaceAll(v, HOST_KEYWORD, host)
-			v = strings.ReplaceAll(v, SEMIHOST_KEYWORD, semiHost)
-			v = strings.ReplaceAll(v, HOSTPORT_KEYWORD, u.Host)
-			v = strings.ReplaceAll(v, PORT_KEYWORD, port)
-			v = strings.ReplaceAll(v, SUB_KEYWORD, sub)
 			headers[CanonicalHeader] = strings.ReplaceAll(v, keyword, string(inputitem))
 		}
 		req.Headers = headers
 	}
 
-	// Custom templates (TODO: add for headers too)
+	// Custom templates
 	req.Url = strings.ReplaceAll(req.Url, HOST_KEYWORD, host)
 	req.Opaque = strings.ReplaceAll(req.Opaque, HOST_KEYWORD, host)
 	req.Data = []byte(strings.ReplaceAll(string(req.Data), HOST_KEYWORD, host))

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 	"strings"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/ffuf/ffuf/pkg/interactive"
 	"github.com/ffuf/ffuf/pkg/output"
 	"github.com/ffuf/ffuf/pkg/runner"
+	"github.com/icza/gox/stringsx"
 )
 
 type multiStringFlag []string
@@ -45,7 +47,7 @@ func (m *wordlistFlag) Set(value string) error {
 	return nil
 }
 
-//ParseFlags parses the command line flags and (re)populates the ConfigOptions struct
+// ParseFlags parses the command line flags and (re)populates the ConfigOptions struct
 func ParseFlags(opts *ffuf.ConfigOptions) *ffuf.ConfigOptions {
 	var ignored bool
 	var cookies, autocalibrationstrings, headers, inputcommands multiStringFlag
@@ -127,6 +129,45 @@ func ParseFlags(opts *ffuf.ConfigOptions) *ffuf.ConfigOptions {
 	opts.General.AutoCalibrationStrings = autocalibrationstrings
 	opts.HTTP.Cookies = cookies
 	opts.HTTP.Headers = headers
+
+	tempURL := strings.ReplaceAll(opts.HTTP.URL, runner.HOST_KEYWORD, "")
+	tempURL = strings.ReplaceAll(tempURL, runner.SEMIHOST_KEYWORD, "")
+	tempURL = strings.ReplaceAll(tempURL, runner.PORT_KEYWORD, "")
+	tempURL = strings.ReplaceAll(tempURL, runner.HOSTPORT_KEYWORD, "")
+
+	u, err := url.Parse(stringsx.Clean(tempURL))
+	if err != nil {
+		// Todo: improve
+		return nil
+	}
+
+	var port, host string
+	if strings.Contains(u.Host, ":") {
+		// Port is not implicit aak 80 or 443
+		split := strings.Split(u.Host, ":")
+		host = split[0]
+		port = split[1]
+	} else {
+		host = u.Host
+		if strings.HasPrefix(tempURL, "https") {
+			port = "443"
+		} else {
+			port = "80"
+		}
+	}
+
+	sub := strings.Split(host, ".")[0]
+	semiHost := runner.RemoveLeftmostPart(host)
+
+	for i, _ := range opts.HTTP.Headers {
+		opts.HTTP.Headers[i] = strings.ReplaceAll(opts.HTTP.Headers[i], runner.HOST_KEYWORD, host)
+		opts.HTTP.Headers[i] = strings.ReplaceAll(opts.HTTP.Headers[i], runner.SEMIHOST_KEYWORD, semiHost)
+		opts.HTTP.Headers[i] = strings.ReplaceAll(opts.HTTP.Headers[i], runner.PORT_KEYWORD, port)
+		opts.HTTP.Headers[i] = strings.ReplaceAll(opts.HTTP.Headers[i], runner.HOSTPORT_KEYWORD, u.Host)
+		opts.HTTP.Headers[i] = strings.ReplaceAll(opts.HTTP.Headers[i], runner.SUB_KEYWORD, sub)
+	}
+	fmt.Println(opts.HTTP.Headers)
+
 	opts.Input.Inputcommands = inputcommands
 	opts.Input.Wordlists = wordlists
 	return opts
