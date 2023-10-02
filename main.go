@@ -166,7 +166,6 @@ func ParseFlags(opts *ffuf.ConfigOptions) *ffuf.ConfigOptions {
 		opts.HTTP.Headers[i] = strings.ReplaceAll(opts.HTTP.Headers[i], runner.HOSTPORT_KEYWORD, u.Host)
 		opts.HTTP.Headers[i] = strings.ReplaceAll(opts.HTTP.Headers[i], runner.SUB_KEYWORD, sub)
 	}
-	fmt.Println(opts.HTTP.Headers)
 
 	opts.Input.Inputcommands = inputcommands
 	opts.Input.Wordlists = wordlists
