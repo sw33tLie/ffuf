@@ -3,7 +3,6 @@ package runner
 import (
 	"bytes"
 	"crypto/tls"
-	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -95,7 +94,6 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	req.Headers = r.config.Headers
 	req.Url = r.config.Url
 	req.Opaque = r.config.Opaque
-	fmt.Println(req.Opaque)
 	req.Method = r.config.Method
 	req.Data = []byte(r.config.Data)
 
