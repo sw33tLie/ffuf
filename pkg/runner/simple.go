@@ -3,6 +3,7 @@ package runner
 import (
 	"bytes"
 	"crypto/tls"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -18,7 +19,7 @@ import (
 	"github.com/icza/gox/stringsx"
 )
 
-//Download results < 5MB
+// Download results < 5MB
 const MAX_DOWNLOAD_SIZE = 5242880
 
 const (
@@ -83,6 +84,7 @@ func (r *SimpleRunner) Prepare(input map[string][]byte) (ffuf.Request, error) {
 	req.Headers = r.config.Headers
 	req.Url = r.config.Url
 	req.Opaque = r.config.Opaque
+	fmt.Println(req.Opaque)
 	req.Method = r.config.Method
 	req.Data = []byte(r.config.Data)
 

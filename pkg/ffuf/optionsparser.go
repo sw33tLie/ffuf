@@ -3,12 +3,14 @@ package ffuf
 import (
 	"bufio"
 	"context"
+	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"net/textproto"
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -101,7 +103,7 @@ type MatcherOptions struct {
 	Words  string
 }
 
-//NewConfigOptions returns a newly created ConfigOptions struct with default values
+// NewConfigOptions returns a newly created ConfigOptions struct with default values
 func NewConfigOptions() *ConfigOptions {
 	c := &ConfigOptions{}
 	c.Filter.Lines = ""
@@ -158,7 +160,7 @@ func NewConfigOptions() *ConfigOptions {
 	return c
 }
 
-//ConfigFromOptions parses the values in ConfigOptions struct, ensures that the values are sane,
+// ConfigFromOptions parses the values in ConfigOptions struct, ensures that the values are sane,
 // and creates a Config struct out of them.
 func ConfigFromOptions(parseOpts *ConfigOptions, ctx context.Context, cancel context.CancelFunc) (*Config, error) {
 	//TODO: refactor in a proper flag library that can handle things like required flags
@@ -258,7 +260,14 @@ func ConfigFromOptions(parseOpts *ConfigOptions, ctx context.Context, cancel con
 	}
 
 	if parseOpts.Input.Opaque != "" {
-		conf.Opaque = parseOpts.Input.Opaque
+		// {0xab} byte decoding syntax
+		re := regexp.MustCompile(`\{0x([0-9a-fA-F]{2})\}`)
+		conf.Opaque = re.ReplaceAllStringFunc(parseOpts.Input.Opaque, func(match string) string {
+			hexValue := match[3:5]
+			byteValue, _ := hex.DecodeString(hexValue)
+			return string(byteValue)
+		})
+
 	}
 
 	// Prepare SNI
