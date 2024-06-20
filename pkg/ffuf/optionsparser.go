@@ -426,15 +426,6 @@ func ConfigFromOptions(parseOpts *ConfigOptions, ctx context.Context, cancel con
 	conf.Noninteractive = parseOpts.General.Noninteractive
 	conf.Verbose = parseOpts.General.Verbose
 
-	// Handle copy as curl situation where POST method is implied by --data flag. If method is set to anything but GET, NOOP
-	if len(conf.Data) > 0 &&
-		conf.Method == "GET" &&
-		//don't modify the method automatically if a request file is being used as input
-		len(parseOpts.Input.Request) == 0 {
-
-		conf.Method = "POST"
-	}
-
 	conf.CommandLine = strings.Join(os.Args, " ")
 
 	for _, provider := range conf.InputProviders {
